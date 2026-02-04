@@ -154,7 +154,7 @@ We want to see the following values published on new topics:
 
 ### B. Jitter in IMU data
 
-Our car runs with two GNSS sensors from novatel which both report IMU measurements. Ideally, we would like these sensors to publish at a consistent ∆t (ie a fixed rate). Jitter is defiend as the variance of the ∆t between consecutive measurements. Compute the jitter for the top IMU report it. Compute this metric using a sliding window and consider the last `1s` of data in this sliding window. Our goal is to see your ability to write logic that can handle messages across time intervals.
+Our car runs with three GNSS sensors from novatel and vectornav which report IMU measurements. Ideally, we would like these sensors to publish at a consistent ∆t (ie a fixed rate). Jitter is defiend as the variance of the ∆t between consecutive measurements. Compute the jitter for all three IMUs and report it. Compute this metric using a sliding window and consider the last `1s` of data in this sliding window. Our goal is to see your ability to write logic that can handle messages across time intervals.
 
 Relevant toipcs: 
 - Top IMU: `/novatel_top/rawimu`
@@ -183,7 +183,7 @@ We want to see the following values published on new topics:
 
 2. Launch foxglove and launch the foxglove bridge `ros2 launch foxglove_bridge foxglove_bridge_launch.xml`. Make sure you source your install before launching the bridge (see below about sourcing).
 
-3. Foxglove supports making some really useful panels with plots, 3D visualization position / sensor data, and more. We have attached a panel to start with (`panel.json`) which just creates an empty plot and a 3D visualization that shows the LiDAR scans. An important part of working on the stack invovles adding to foxglove panels to visualize and plot your data, so adjust the given panel to include all of the metrics A-C above. 
+3. Foxglove supports making some really useful panels with plots, 3D visualization position / sensor data, and more. We have attached a panel to start with (`panel.json`) which just creates an empty plot and a 3D visualization panel. An important part of working on the stack invovles adding to foxglove panels to visualize and plot your data, so adjust the given panel to include all of the metrics A-C above. Feel free to be creative here, as there are many different types of panels that foxglove supports.
 
 4. Screen record the foxglove app and play the entire bag, so we can see the metrics you computed. 
 
