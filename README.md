@@ -1,10 +1,10 @@
 # Cavalier Autonomous Racing
 
-Hello! The goal of these take-home tasks is to provide an introduction of some of the tools we use in our stack. These tools include C++ and ROS2, which you will learn about if you haven't already used them.
+Hello! The goal of these take-home tasks is to provide an introduction of some of the tools we use in our stack. These tools include C++ and ROS2, which you will learn about if you haven't already used them. While the majority of code we write for the car and the provided template node is in C++, ROS2 contains a python interface so feel free to use Python if desired.
 
 We want to see you become comfortable with writing code with the tools that run directly on our car and seeing some examples of real data from our car. You will visualize your results, and submit screen recordings of these visualizations as well as a GitHub repository with your code. We evaluate every submission on quality and completion of the tasks.
 
-These tasks are definitely not easy, so we highly recommend joining our Slack. If there are **any** questions or ambiguities in the instructions, please send a message in `#all-cavalier-take-home-slack`. We encourage you to ask questions in this Slack channel so everyone can benefit from the answers. Furthermore, join `#office-hours` to stop by and get help in person.
+These tasks are definitely not easy, so we highly recommend joining our Slack. If there are **any** questions or ambiguities in the instructions, please send a message in `#all-cavaliertakehomefall26`. We encourage you to ask questions in this Slack channel so everyone can benefit from the answers.
 
 Try your best and put in quality work – completing and understanding two tasks is better than ChatGPT-ing your way through all without understanding anything. You can definitely use generative AI to help, but don't rely on it too much; it can often be misleading for working with ROS2.
 
@@ -14,7 +14,7 @@ With that said, let's dive in.
 
 ## Task 0: Install ROS2
 
-Robot Operating System (ROS) is a framework that we use to develop our racing stack and interface with the car. The first step of this take home assignment is to install ROS2. **Make sure to install version humble.** These instructions are easiest to follow using Linux (Ubuntu 22.04). We recommend using Linux natively with dual boot, but you we also have instructions to set up Ubuntu 22.04 on MacOS or Windows.
+Robot Operating System (ROS) is a framework that we use to develop our racing stack and interface with the car. The first step of this take home assignment is to install ROS2. **Make sure to install version humble.** These instructions are easiest to follow using Linux (Ubuntu 22.04). We recommend using Linux natively with dual boot, but we also have instructions to set up Ubuntu 22.04 on macOS or Windows.
 
 [MacOS Docker Instructions here](./MacOS-Docker.md)
 
@@ -28,13 +28,13 @@ Linux: https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 
 Also install colcon: https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html
 
-Also install foxglove https://foxglove.dev/ and `sudo apt install ros-humble-foxglove-bridge`
+Also install foxglove https://foxglove.dev/ and `sudo apt install ros-humble-foxglove-bridge` (skip if using DevContainer)
 
-Also install mcap storage plugin `sudo apt install ros-humble-rosbag2-storage-mcap`
+Also install mcap storage plugin `sudo apt install ros-humble-rosbag2-storage-mcap` (skip if using DevContainer)
 
 ## Task 0.5: Learn Git
 
-If you haven't worked with git before it is a version control tool that helps multiple contributors work on one project. While this won't be super critical for this take-home assignment, it will be when you are a crew member. If you haven't used git before, I highly recommend learning the basics. This is one introduction courrse I found https://learn.microsoft.com/en-us/training/modules/intro-to-git/, but feel free to use whatever. 
+If you haven't worked with git before it is a version control tool that helps multiple contributors work on one project. While this won't be super critical for this take-home assignment, it will be when you are a crew member. If you haven't used git before, I highly recommend learning the basics. This is one introduction course I found https://learn.microsoft.com/en-us/training/modules/intro-to-git/, but feel free to use whatever. 
 
 ## Task 1: Complete ROS2 Tutorials
 
@@ -43,7 +43,7 @@ If you haven't worked with git before it is a version control tool that helps mu
 3. https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html
 4. https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html
 
-If you are a mac user with docker you won't be able to run the turtle sim, but still read through the tutorials because understanding the publisher-subscriber architecture of ROS will be really important for the next task. 
+If you are a macOS user (Docker or DevContainer) you won't be able to run the turtle sim, but still read through the tutorials because understanding the publisher-subscriber architecture of ROS will be really important for the next task. 
 
 ## Task 2: Write code to compute metrics
 
@@ -154,9 +154,9 @@ We want to see the following values published on new topics:
 
 ### B. Jitter in IMU data
 
-Our car runs with three GNSS sensors from novatel and vectornav which report IMU measurements. Ideally, we would like these sensors to publish at a consistent ∆t (ie a fixed rate). Jitter is defiend as the variance of the ∆t between consecutive measurements. Compute the jitter for all three IMUs and report it. Compute this metric using a sliding window and consider the last `1s` of data in this sliding window. Our goal is to see your ability to write logic that can handle messages across time intervals.
+Our car runs with three GNSS sensors from novatel and vectornav which report IMU measurements. Ideally, we would like these sensors to publish at a consistent ∆t (ie a fixed rate). Jitter is defined as the variance of the ∆t between consecutive measurements. Compute the jitter for all three IMUs and report it. Compute this metric using a sliding window and consider the last `1s` of data in this sliding window. Our goal is to see your ability to write logic that can handle messages across time intervals.
 
-Relevant toipcs: 
+Relevant topics: 
 - Top IMU: `/novatel_top/rawimu`
 - Bottom IMU: `/novatel_bottom/rawimu`
 - VectorNav IMU: `/vectornav/raw/common`
@@ -172,7 +172,7 @@ How long does it take in seconds for the vehicle to complete 1 lap.
 
 Relevant topics:
 - Vehicle Odometry (i.e. Pose and Twist) `/vehicle/uva_odometry`
-- Curvilinear Distance (Forward progress along the track in meters) `curvilinear_distance`
+- Curvilinear Distance (Forward progress along the track in meters) `/curvilinear_distance`
 
 We want to see the following values published on new topics:
 - `lap_time`
@@ -183,7 +183,7 @@ We want to see the following values published on new topics:
 
 2. Launch foxglove and launch the foxglove bridge `ros2 launch foxglove_bridge foxglove_bridge_launch.xml`. Make sure you source your install before launching the bridge (see below about sourcing).
 
-3. Foxglove supports making some really useful panels with plots, 3D visualization position / sensor data, and more. We have attached a panel to start with (`panel.json`) which just creates an empty plot and a 3D visualization panel. An important part of working on the stack invovles adding to foxglove panels to visualize and plot your data, so adjust the given panel to include all of the metrics A-C above. Feel free to be creative here, as there are many different types of panels that foxglove supports.
+3. Foxglove supports making some really useful panels with plots, 3D visualization position / sensor data, and more. We have attached a panel to start with (`panel.json`) which just creates an empty plot and a 3D visualization panel. An important part of working on the stack involves adding to foxglove panels to visualize and plot your data, so adjust the given panel to include all of the metrics A-C above. Feel free to be creative here, as there are many different types of panels that foxglove supports.
 
 4. Screen record the foxglove app and play the entire bag, so we can see the metrics you computed. 
 
@@ -199,8 +199,8 @@ Please upload your screen recording and share the link to it as a part of the PR
 
 ### Clone this repo into your home directory
 
-```{bash}
-git clone git@github.com:linklab-uva/cav_take_home_fall_26.git
+```bash
+git clone https://github.com/linklab-uva/cav_take_home_fall_26.git
 ```
 
 ### Sourcing
