@@ -16,15 +16,17 @@ With that said, let's dive in.
 
 Robot Operating System (ROS) is a framework that we use to develop our racing stack and interface with the car. The first step of this take home assignment is to install ROS2. **Make sure to install version humble.** These instructions are easiest to follow using Linux (Ubuntu 22.04). We recommend using Linux natively with dual boot, but you we also have instructions to set up Ubuntu 22.04 on MacOS or Windows.
 
-[MacOS Instructions here](./MacOS.md)
+[MacOS Docker Instructions here](./MacOS-Docker.md)
+
+[MacOS DevContainer Instructions here](./MacOS-DevContainer.md)
 
 [Windows (WSL) Instructions here](./WSL.md)
 
-Regardless of how you get to Ubuntu 22.04, you should install ROS2 using the following instructions:
+Regardless of how you get to Ubuntu 22.04, you should install ROS2 using the following instructions (you can skip this if you are using the DevContainer):
 
 Linux: https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html
 
-Also install colcon: https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html
+Also install colcon: https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html
 
 Also install foxglove https://foxglove.dev/ and `sudo apt install ros-humble-foxglove-bridge`
 
@@ -55,8 +57,8 @@ To get started do the following:
 
 ```
 cd ~/
-git clone https://github.com/linklab-uva/cav_take_home.git
-cd cav_take_home
+git clone https://github.com/linklab-uva/cav_take_home_fall_26.git
+cd cav_take_home_fall_26
 source /opt/ros/humble/setup.bash
 colcon build
 ```
@@ -156,9 +158,13 @@ Our car runs with two GNSS sensors from novatel which both report IMU measuremen
 
 Relevant toipcs: 
 - Top IMU: `/novatel_top/rawimu`
+- Bottom IMU: `/novatel_bottom/rawimu`
+- VectorNav IMU: `/vectornav/raw/common`
 
 We want to see the following values published on new topics:
 - `imu_top/jitter`
+- `imu_bottom/jitter`
+- `imu_vectornav/jitter`
 
 ### C. Lap time
 
@@ -194,12 +200,12 @@ Please upload your screen recording and share the link to it as a part of the PR
 ### Clone this repo into your home directory
 
 ```{bash}
-git clone git@github.com:linklab-uva/cav_take_home.git
+git clone git@github.com:linklab-uva/cav_take_home_fall_26.git
 ```
 
 ### Sourcing
 Whenever you run anything, it is critical that you source your workspace. This allows you to work with our custom ROS2 message types and run the packages you've built. 
 
 ```{bash}
-source ~/cav_take_home/install/setup.sh
+source ~/cav_take_home_fall_26/install/setup.sh
 ```
