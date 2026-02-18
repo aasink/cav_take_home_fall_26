@@ -16,6 +16,7 @@ find_package(std_msgs REQUIRED)
 find_package(raptor_dbw_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(deep_orange_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 
 # Create the library
 add_library(${PROJECT_NAME} SHARED
@@ -37,6 +38,8 @@ ament_target_dependencies(${PROJECT_NAME}
   std_msgs
   ament_index_cpp
   deep_orange_msgs
+  raptor_dbw_msgs
+  message_filters
 )
 
 # Install the library
