@@ -40,6 +40,7 @@ class TakeHome : public rclcpp::Node {
   message_filters::Subscriber<nav_msgs::msg::Odometry> Wodometry_subscriber_;
   message_filters::Subscriber<raptor_dbw_msgs::msg::WheelSpeedReport> wspeed_subscriber_;           //  subscriptions for data for wheel speed
   message_filters::Subscriber<raptor_dbw_msgs::msg::SteeringExtendedReport> wangle_subscriber_;
+  //  https://docs.ros.org/en/humble/p/message_filters/doc/Tutorials/Approximate-Synchronizer-Cpp.html
 
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr wslip_rr_publisher_;
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr wslip_rl_publisher_;                // wheel slip publishers
