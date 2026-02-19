@@ -21,6 +21,17 @@ TakeHome::TakeHome(const rclcpp::NodeOptions& options)
 
       sync->setAgePenalty(0.50);          // register the callback for wheel speed
       sync->registerCallback(std::bind(&TakeHome::wheelSlip_callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+
+    topImu_subscriber_ = this->create_subscription<novatel_oem7_msgs::msg::RAWIMU>(       // subscribe to imu measurments
+      "novatel_top/rawimu", qos_profile,
+      std::bind(&TakeHome::topJitter_callback, this, std::placeholders::_1));
+    bottomImu_subscriber_ = this->create_subscription<novatel_oem7_msgs::msg::RAWIMU>(
+      "novatel_bottom/rawimu", qos_profile,
+      std::bind(&TakeHome::botJitter_callback, this, std::placeholders::_1));
+    vnImu_subscriber_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(
+      "vectornav/raw/common", qos_profile,
+      std::bind(&TakeHome::vnavJitter_callback, this, std::placeholders::_1));
     
     // Look at the hpp file to define all class variables, including subscribers
     // A subscriber will "listen" to a topic and whenever a message is published to it, the subscriber
@@ -29,12 +40,16 @@ TakeHome::TakeHome(const rclcpp::NodeOptions& options)
       "vehicle/uva_odometry", qos_profile,
       std::bind(&TakeHome::odometry_callback, this, std::placeholders::_1));
 
-      metric_publisher_ = this->create_publisher<std_msgs::msg::Float32>("metrics_output", qos_profile);
+    metric_publisher_ = this->create_publisher<std_msgs::msg::Float32>("metrics_output", qos_profile);
 
-      wslip_rr_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/rr", qos_profile);
-      wslip_rl_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/rl", qos_profile);     // create wheel slip publishers
-      wslip_fr_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/fr", qos_profile);
-      wslip_fl_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/fl", qos_profile);
+    wslip_rr_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/rr", qos_profile);
+    wslip_rl_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/rl", qos_profile);     // create wheel slip publishers
+    wslip_fr_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/fr", qos_profile);
+    wslip_fl_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/fl", qos_profile);
+
+    jitter_top_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_top/jitter", qos_profile);
+    jitter_bottom_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_bottom_jitter", qos_profile);   // create jitter publishers
+    jitter_vn_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_vectornav/jitter", qos_profile);
 }
 
 // 
@@ -138,6 +153,23 @@ void TakeHome::wheelSlip_callback(nav_msgs::msg::Odometry::ConstSharedPtr odom_m
   wslip_rl_publisher_->publish(ws_rl);   // publish the wheel slips
   wslip_fr_publisher_->publish(ws_fr);
   wslip_fl_publisher_->publish(ws_fl);
+}
+
+float calcJitter(int windowId) {
+  // calc the jitter for the current window specified by id
+}
+
+void TakeHome::topJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr top_msg) {
+  // calc jitter 
+  // use dequeue to hold 1 sec sliding window init to all 0
+}
+  
+void TakeHome::botJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr bottom_msg) {
+  // calc jitter
+}
+
+void TakeHome::vnavJitter_callback(vectornav_msgs::msg::CommonGroup::ConstSharedPtr vnav_msg) {
+  // calc jitter
 }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(TakeHome)

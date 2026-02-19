@@ -5,6 +5,8 @@
 #include <nav_msgs/msg/odometry.hpp> 
 #include <raptor_dbw_msgs/msg/wheel_speed_report.hpp>
 #include <raptor_dbw_msgs/msg/steering_extended_report.hpp>
+#include <novatel_oem7_msgs/msg/rawimu.hpp>
+#include <vectornav_msgs/msg/common_group.hpp>
 
 #include "message_filters/subscriber.h"
 #include "message_filters/synchronizer.h"
@@ -22,6 +24,9 @@ class TakeHome : public rclcpp::Node {
   void wheelSlip_callback(nav_msgs::msg::Odometry::ConstSharedPtr odom_msg,
                           raptor_dbw_msgs::msg::WheelSpeedReport::ConstSharedPtr wheel_msg,
                           raptor_dbw_msgs::msg::SteeringExtendedReport::ConstSharedPtr steer_msg);
+  void topJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr top_msg);
+  void botJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr bottom_msg);
+  void vnavJitter_callback(vectornav_msgs::msg::CommonGroup::ConstSharedPtr vnav_msg);
 
  private:
   const float WF = 1.638f;   // front track width (meters)
@@ -32,6 +37,10 @@ class TakeHome : public rclcpp::Node {
   float wheelSlip_front(float vx, float w, float vy, float angle, float vw, bool leftW);
   float convertSpeed(float kmph);                   // convert from kmph to m/s
   float convertAngle(float deg);          // convert from deg to rad
+
+  //keep map of dequeus here
+
+  float calcJitter(int windowId);   // calculate the jitter for the current specified window
 
   // Subscribers and Publishers
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
@@ -51,5 +60,12 @@ class TakeHome : public rclcpp::Node {
    nav_msgs::msg::Odometry,
    raptor_dbw_msgs::msg::WheelSpeedReport,                           // synchronizer for wheel slip
    raptor_dbw_msgs::msg::SteeringExtendedReport>>> sync;
+
+  rclcpp::Subscription<novatel_oem7_msgs::msg::RAWIMU>::SharedPtr topImu_subscriber_;
+  rclcpp::Subscription<novatel_oem7_msgs::msg::RAWIMU>::SharedPtr bottomImu_subscriber_;     // subscriptions for imus
+  rclcpp::Subscription<vectornav_msgs::msg::CommonGroup>::SharedPtr vnImu_subscriber_;
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr jitter_top_publisher_;
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr jitter_bottom_publisher_;    // publishers for jitters
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr jitter_vn_publisher_;
 
 };
