@@ -16,6 +16,8 @@
 #include <rclcpp/node_options.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+enum IMUidx { TOP = 0, BOTTOM = 1, VECTORNAV = 2, imuCount = 3 };  // enum to index window array
+
 class TakeHome : public rclcpp::Node {
  public:
   TakeHome(const rclcpp::NodeOptions& options);
@@ -38,9 +40,10 @@ class TakeHome : public rclcpp::Node {
   float convertSpeed(float kmph);                   // convert from kmph to m/s
   float convertAngle(float deg);          // convert from deg to rad
 
-  //keep map of dequeus here
+  std::array<std::deque<rclcpp::Time>,  imuCount> sWindow;    // arr to hold sliding window for each imu data stream
 
   float calcJitter(int windowId);   // calculate the jitter for the current specified window
+  void updateWindow(int windowId, const rclcpp::Time& msgTime);     // update the sliding window window
 
   // Subscribers and Publishers
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;

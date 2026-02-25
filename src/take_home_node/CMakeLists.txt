@@ -17,6 +17,8 @@ find_package(raptor_dbw_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(deep_orange_msgs REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(novatel_oem7_msgs)
+find_package(vectornav_msgs)
 
 # Create the library
 add_library(${PROJECT_NAME} SHARED
@@ -40,6 +42,8 @@ ament_target_dependencies(${PROJECT_NAME}
   deep_orange_msgs
   raptor_dbw_msgs
   message_filters
+  novatel_oem7_msgs
+  vectornav_msgs
 )
 
 # Install the library

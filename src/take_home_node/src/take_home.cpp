@@ -155,21 +155,78 @@ void TakeHome::wheelSlip_callback(nav_msgs::msg::Odometry::ConstSharedPtr odom_m
   wslip_fl_publisher_->publish(ws_fl);
 }
 
-float calcJitter(int windowId) {
-  // calc the jitter for the current window specified by id
+float TakeHome::calcJitter(int windowId) {
+  auto &window = sWindow[windowId];   // get the window
+
+  if (window.size() < 2) {     // if not enough times to calc deleta t
+    return 0.0f;
+  }
+
+  std::vector<float> deltaTs;       // create vector to hold delta ts and set size to window - 1
+  deltaTs.reserve(window.size() - 1);
+  
+  for(size_t i = 1; i < window.size(); i++) {
+    float deltaT = (window[i] - window[i - 1]).seconds();       // calculate all the delta ts & add to vector
+    deltaTs.push_back(deltaT);
+  }
+  
+  float dmean;                       // calcualte the mean of the delta Ts
+  for(float deltaT : deltaTs) {
+    dmean += deltaT;
+  }
+  dmean = dmean / deltaTs.size();
+
+  float jitter;
+  for(float deltaT: deltaTs) {             // calculate the jitter
+    jitter += std::pow(deltaT - dmean, 2);
+  }
+  jitter = jitter / deltaTs.size();
+
+  return jitter;
+}
+
+void TakeHome::updateWindow(int windowId, const rclcpp::Time& msgTime) {
+  auto &window = sWindow[windowId];      // get the Top imu window and add new msg timestamp
+  window.push_back(msgTime);                
+
+  rclcpp::Time wboundary = msgTime - rclcpp::Duration::from_seconds(1.0);  // get the begining boundary for the window
+
+  while(!window.empty() && window.front() < wboundary) {    // rremove messages if older than a second
+    window.pop_front();
+  }
 }
 
 void TakeHome::topJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr top_msg) {
-  // calc jitter 
-  // use dequeue to hold 1 sec sliding window init to all 0
+  rclcpp::Time  msgTime(top_msg->header.stamp);     /// get the time stampe fo the message
+
+  updateWindow(TOP, msgTime);
+  float jitter = calcJitter(TOP);
+
+  std_msgs::msg::Float32 jitter_msg;     // publish top jitter
+  jitter_msg.data = jitter;
+  jitter_top_publisher_->publish(jitter_msg);
 }
-  
+
 void TakeHome::botJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr bottom_msg) {
-  // calc jitter
+  rclcpp::Time  msgTime(bottom_msg->header.stamp);     /// get the time stampe fo the message
+
+  updateWindow(BOTTOM, msgTime);
+  float jitter = calcJitter(BOTTOM);
+
+  std_msgs::msg::Float32 jitter_msg;     // publish bottom jitter
+  jitter_msg.data = jitter;
+  jitter_bottom_publisher_->publish(jitter_msg);
 }
 
 void TakeHome::vnavJitter_callback(vectornav_msgs::msg::CommonGroup::ConstSharedPtr vnav_msg) {
-  // calc jitter
+  rclcpp::Time  msgTime(vnav_msg->header.stamp);     /// get the time stampe fo the message
+
+  updateWindow(VECTORNAV, msgTime);
+  float jitter = calcJitter(VECTORNAV);
+
+  std_msgs::msg::Float32 jitter_msg;     // publish vector nav jitter
+  jitter_msg.data = jitter;
+  jitter_vn_publisher_->publish(jitter_msg);
 }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(TakeHome)
