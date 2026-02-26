@@ -43,7 +43,7 @@ class TakeHome : public rclcpp::Node {
   std::array<std::deque<rclcpp::Time>,  imuCount> sWindow;    // arr to hold sliding window for each imu data stream
 
   float calcJitter(int windowId);   // calculate the jitter for the current specified window
-  void updateWindow(int windowId, const rclcpp::Time& msgTime);     // update the sliding window window
+  void updateWindow(int windowId, rclcpp::Time msgTime);     // update the sliding window window
 
   // Subscribers and Publishers
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;

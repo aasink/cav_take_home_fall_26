@@ -48,7 +48,7 @@ TakeHome::TakeHome(const rclcpp::NodeOptions& options)
     wslip_fl_publisher_ = this->create_publisher<std_msgs::msg::Float32>("slip/long/fl", qos_profile);
 
     jitter_top_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_top/jitter", qos_profile);
-    jitter_bottom_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_bottom_jitter", qos_profile);   // create jitter publishers
+    jitter_bottom_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_bottom/jitter", qos_profile);   // create jitter publishers
     jitter_vn_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_vectornav/jitter", qos_profile);
 }
 
@@ -185,7 +185,7 @@ float TakeHome::calcJitter(int windowId) {
   return jitter;
 }
 
-void TakeHome::updateWindow(int windowId, const rclcpp::Time& msgTime) {
+void TakeHome::updateWindow(int windowId, rclcpp::Time msgTime) {
   auto &window = sWindow[windowId];      // get the Top imu window and add new msg timestamp
   window.push_back(msgTime);                
 
