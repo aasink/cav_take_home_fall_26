@@ -32,6 +32,10 @@ TakeHome::TakeHome(const rclcpp::NodeOptions& options)
     vnImu_subscriber_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(
       "vectornav/raw/common", qos_profile,
       std::bind(&TakeHome::vnavJitter_callback, this, std::placeholders::_1));
+
+    curvilinear_subscriber_ = this->create_subscription<std_msgs::msg::Float32>(
+      "curvilinear_distance", qos_profile,
+      std::bind(&TakeHome::laptime_callback, this, std::placeholders::_1));
     
     // Look at the hpp file to define all class variables, including subscribers
     // A subscriber will "listen" to a topic and whenever a message is published to it, the subscriber
@@ -50,6 +54,8 @@ TakeHome::TakeHome(const rclcpp::NodeOptions& options)
     jitter_top_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_top/jitter", qos_profile);
     jitter_bottom_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_bottom/jitter", qos_profile);   // create jitter publishers
     jitter_vn_publisher_ = this->create_publisher<std_msgs::msg::Float32>("imu_vectornav/jitter", qos_profile);
+
+    laptime_publisher_ = this->create_publisher<std_msgs::msg::Float32>("/laptime", rclcpp::QoS(10).reliable());       // create laptime publisher
 }
 
 // 
@@ -228,5 +234,36 @@ void TakeHome::vnavJitter_callback(vectornav_msgs::msg::CommonGroup::ConstShared
   jitter_msg.data = jitter;
   jitter_vn_publisher_->publish(jitter_msg);
 }
+
+void TakeHome::laptime_callback(const std_msgs::msg::Float32::SharedPtr msg) {
+  rclcpp::Time msgTime = this->now();     // record time of current message
+  float dist = msg->data;                        // get curvilinear dist from msg
+
+  if(!lapstartInit && dist < 10) {
+    lapStart = std::make_pair(dist, msgTime);   // store first value for when end of lap is reached
+    lastMsg = std::make_pair(dist, msgTime);    // also set the last message pair to current message
+    lapstartInit = true;
+    return;
+  }
+
+  float lastdist = lastMsg.first;     // get the dist of the last recived message
+
+  if(dist < lastdist - 10) {                            // see if dist drops significantly w/ a buffer zone fo 10
+    rclcpp::Time lstartTime = lapStart.second;                         // get start time
+    rclcpp::Duration laptime = msgTime - lstartTime;       // calc the lap time
+    float laptime_s = laptime.seconds();
+
+    std_msgs::msg::Float32 laptime_msg;     // publish laptime
+    laptime_msg.data = laptime_s;
+    laptime_publisher_->publish(laptime_msg);
+
+    lapStart = std::make_pair(dist, msgTime);   // store first value for when end of lap is reached
+    lastMsg = std::make_pair(dist, msgTime);    // also set the last message pair to current message
+    return;
+  }
+
+  lastMsg = std::make_pair(dist, msgTime);    // set the last message pair to the current message
+}
+
 
 RCLCPP_COMPONENTS_REGISTER_NODE(TakeHome)

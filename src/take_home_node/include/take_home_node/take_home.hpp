@@ -29,6 +29,7 @@ class TakeHome : public rclcpp::Node {
   void topJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr top_msg);
   void botJitter_callback(novatel_oem7_msgs::msg::RAWIMU::ConstSharedPtr bottom_msg);
   void vnavJitter_callback(vectornav_msgs::msg::CommonGroup::ConstSharedPtr vnav_msg);
+  void laptime_callback(std_msgs::msg::Float32::SharedPtr msg);
 
  private:
   const float WF = 1.638f;   // front track width (meters)
@@ -44,6 +45,10 @@ class TakeHome : public rclcpp::Node {
 
   float calcJitter(int windowId);   // calculate the jitter for the current specified window
   void updateWindow(int windowId, rclcpp::Time msgTime);     // update the sliding window window
+
+  std::pair<float, rclcpp::Time> lapStart;      // hold the curvilinear dist and the time of the dist for start of lap
+  std::pair<float, rclcpp::Time> lastMsg;      // hold the last curv dist sent
+  bool lapstartInit = false;                      // for the first lapstart 
 
   // Subscribers and Publishers
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
@@ -71,4 +76,6 @@ class TakeHome : public rclcpp::Node {
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr jitter_bottom_publisher_;    // publishers for jitters
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr jitter_vn_publisher_;
 
+  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr curvilinear_subscriber_;      // subscripter for  curvilenar dist
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr laptime_publisher_;               // publisher for laptime
 };
