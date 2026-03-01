@@ -17,8 +17,8 @@ find_package(raptor_dbw_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(deep_orange_msgs REQUIRED)
 find_package(message_filters REQUIRED)
-find_package(novatel_oem7_msgs)
-find_package(vectornav_msgs)
+find_package(novatel_oem7_msgs REQUIRED)
+find_package(vectornav_msgs REQUIRED)
 
 # Create the library
 add_library(${PROJECT_NAME} SHARED
